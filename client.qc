@@ -1157,12 +1157,18 @@ void() PlayerPostThink =
 		self.jump_flag = self.velocity_z;
 
 
-
+	//set v_forward to be the direction the player(self) is facing
 	makevectors (self.v_angle);
+	
+	//offset
 	local vector source = self.origin + '0 0 16';
 	
+	//ray cast forward!
 	traceline (source, source + v_forward*5000, FALSE, self);
+	
+	//render a line to the first intersection of our forward line...
 	//draw_line(source, trace_endpos, 111, 0, TRUE);
+	
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	WriteByte (MSG_BROADCAST, TE_LIGHTNING1);
 	WriteEntity (MSG_BROADCAST, self);
@@ -1173,23 +1179,28 @@ void() PlayerPostThink =
 	WriteCoord (MSG_BROADCAST, trace_endpos_y);
 	WriteCoord (MSG_BROADCAST, trace_endpos_z);
 	
+	//draw the plane normal
 	//draw_line(trace_endpos, trace_endpos+trace_plane_normal, 208, 6, TRUE);
+	
+	//do the vector refleciton math... I didn't come up with this - just copied it from somewhere else
 	local vector reflected_vel = v_forward - 2*(v_forward*trace_plane_normal)*trace_plane_normal;
 	normalize( reflected_vel );
 	
 	//cache first hit
 	local vector first_hit = trace_endpos;
 	
+	//draw special stuff around entities
 	//if(world != trace_ent)
 	//{
-	//	draw_circle( first_hit, 5, 144,-1, TRUE );	
-	//draw_circle( vector origin, float radius, float colormap, float lifetime, float depthtest ) = #85;	
+	//	draw_circle( first_hit, 5, 144,-1, TRUE );
 	//}
+	
+	//it seems that the engine doesn't handle more than one lightning 'writebyte' call 'well' - ie it 
+	// doesn't do what you might hope - so here the workaround is to use another entity in the 
+	// 'writeentity' part of the call - either use one that already exists (world) or make a new one 
+	// for the occasion ('tmp')
 	local entity tmp = spawn();
-	
-	
-	//tmp.velocity = reflected_vel;
-	//setorigin (tmp, first_hit);
+	//do another traceline from the first collision to the next thing.
 	traceline(first_hit, first_hit + reflected_vel * 5000, FALSE, self);
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	WriteByte (MSG_BROADCAST, TE_LIGHTNING1);
@@ -1199,14 +1210,9 @@ void() PlayerPostThink =
 	WriteCoord (MSG_BROADCAST, first_hit_z);
 	WriteCoord (MSG_BROADCAST, trace_endpos_x);
 	WriteCoord (MSG_BROADCAST, trace_endpos_y);
-	WriteCoord (MSG_BROADCAST, trace_endpos_z);
-	//tmp.think = tmpFunc;
+	WriteCoord (MSG_BROADCAST, trace_endpos_z);	
 	remove(tmp);
-	
-	
 	//draw_line(first_hit, trace_endpos, 111, 0, TRUE);
-
-//void draw_line( vector start, vector end, float colormap, float lifetime, float depthtest ) = #82;
 
 	CheckPowerups ();
 };
