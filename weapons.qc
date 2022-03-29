@@ -484,8 +484,10 @@ entity(vector start, vector end, entity teEnt, entity ignore) doThing=
 	// if we hit a damageable entity do damage and flag it
 	if ( trace_ent.takedamage )
 	{
+		if(trace_ent.movetype != MOVETYPE_NONE)
+			trace_ent.effects = trace_ent.effects | EF_MUZZLEFLASH;
 		particle (trace_endpos, '0 0 100', 225, 120);
-		T_Damage (trace_ent, self, self, 5);
+		T_Damage (trace_ent, self, self, 8);
 		teEnt.deadflag = TRUE;	// this means stop bouncing...	
 	}
 	else
@@ -556,7 +558,7 @@ void() W_FireLightning2 =
 	}
 	self.punchangle_x = -2;
 
-	self.currentammo = self.ammo_cells = self.ammo_cells - 1;
+	self.currentammo = self.ammo_cells = self.ammo_cells - .75;
 
 	stupidLightningFunc();
 };
