@@ -461,6 +461,106 @@ void(vector p1, vector p2, entity from, float damage) LightningDamage =
 };
 
 
+entity(vector start, vector end, entity teEnt, entity ignore) doThing=
+{
+	//ray cast forward!
+	traceline (start, end, FALSE, ignore);
+	
+	//draw the lightning in
+	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
+	WriteByte (MSG_BROADCAST, TE_LIGHTNING1);
+	WriteEntity (MSG_BROADCAST, teEnt);
+	WriteCoord (MSG_BROADCAST, start_x); WriteCoord (MSG_BROADCAST, start_y); WriteCoord (MSG_BROADCAST, start_z); //start of lightning
+	WriteCoord (MSG_BROADCAST, trace_endpos_x); WriteCoord (MSG_BROADCAST, trace_endpos_y); WriteCoord (MSG_BROADCAST, trace_endpos_z); //end of lightning
+	
+	local vector normDir = normalize(end-start);
+	//reflection math I found somewhere online - because I decided not to take physics in college
+	local vector reflected_vel = normDir - 2*(normDir*trace_plane_normal)*trace_plane_normal;
+	
+	//use this entity to return info back out
+	teEnt.velocity = normalize( reflected_vel ); // store the direction of the bouced ray!
+	teEnt.origin = trace_endpos; //store the origin of the next ray!
+	
+	// if we hit a damageable entity do damage and flag it
+	if ( trace_ent.takedamage )
+	{
+		particle (trace_endpos, '0 0 100', 225, 120);
+		T_Damage (trace_ent, self, self, 5);
+		teEnt.deadflag = TRUE;	// this means stop bouncing...	
+	}
+	else
+	{
+		teEnt.deadflag = FALSE; //continue BOUNCING!
+	}
+	return teEnt;
+}
+
+.entity l_ent1;
+.entity l_ent2;
+.entity l_ent3;
+.entity l_ent4;
+.entity l_ent5;
+.entity l_ent6;
+.entity l_ent7;
+void() stupidLightningFunc=
+{
+	//offset
+	local vector source = self.origin + '0 0 16';
+	
+	//set v_forward to be the direction the player(self) is facing
+	makevectors (self.v_angle);
+	local vector end = source + v_forward*5000;
+	local entity bounce_result = doThing(source, end, self.l_ent1,self);
+
+	if(bounce_result.deadflag == FALSE)
+	{ bounce_result = doThing(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent2, self.l_ent1); }
+	if(bounce_result.deadflag == FALSE)
+	{ bounce_result = doThing(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent3, self.l_ent1); }
+	if(bounce_result.deadflag == FALSE)
+	{ bounce_result = doThing(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent4, self.l_ent1); }
+	if(bounce_result.deadflag == FALSE)
+	{ bounce_result = doThing(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent5, self.l_ent1); }
+	if(bounce_result.deadflag == FALSE)
+	{ bounce_result = doThing(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent6, self.l_ent1); }
+	if(bounce_result.deadflag == FALSE)
+	{ bounce_result = doThing(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent7, self.l_ent1); }
+}
+
+
+	
+void() W_FireLightning2 =
+{
+	local	float		cells;
+
+	if (self.ammo_cells < 1)
+	{
+		self.weapon = W_BestWeapon ();
+		W_SetCurrentAmmo ();
+		return;
+	}
+
+// explode if under water
+	if (self.waterlevel > 1)
+	{
+		cells = self.ammo_cells;
+		self.ammo_cells = 0;
+		W_SetCurrentAmmo ();
+		T_RadiusDamage (self, self, 35*cells, world);
+		return;
+	}
+
+	if (self.t_width < time)
+	{
+		sound (self, CHAN_WEAPON, "weapons/lhit.wav", 1, ATTN_NORM);
+		self.t_width = time + 0.6;
+	}
+	self.punchangle_x = -2;
+
+	self.currentammo = self.ammo_cells = self.ammo_cells - 1;
+
+	stupidLightningFunc();
+};
+
 void() W_FireLightning =
 {
 	local	vector		org;

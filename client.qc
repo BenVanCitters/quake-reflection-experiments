@@ -63,27 +63,26 @@ void() SetChangeParms =
 	parm1 = self.items;
 	parm2 = self.health;
 	parm3 = self.armorvalue;
-	if (self.ammo_shells < 25)
-		parm4 = 25;
-	else
-		parm4 = self.ammo_shells;
+	parm4 = self.ammo_shells;
 	parm5 = self.ammo_nails;
 	parm6 = self.ammo_rockets;
 	parm7 = self.ammo_cells;
+	if(self.ammo_cells < 25)
+		self.ammo_cells = 25;
 	parm8 = self.weapon;
 	parm9 = self.armortype * 100;
 };
 
 void() SetNewParms =
 {
-	parm1 = IT_SHOTGUN | IT_AXE;
+	parm1 = IT_LIGHTNING | IT_AXE;
 	parm2 = GetMaxHealth();
 	parm3 = 0;
-	parm4 = 25;
+	parm4 = 0;
 	parm5 = 0;
 	parm6 = 0;
-	parm7 = 0;
-	parm8 = 1;
+	parm7 = 25; //cells
+	parm8 = 8;
 	parm9 = 0;
 };
 
@@ -488,13 +487,7 @@ called each time a player is spawned
 void() DecodeLevelParms;
 void() PlayerDie;
 
-.entity l_ent1;
-.entity l_ent2;
-.entity l_ent3;
-.entity l_ent4;
-.entity l_ent5;
-.entity l_ent6;
-.entity l_ent7;
+
 void() PutClientInServer =
 {
 	local	entity spot;
@@ -1131,67 +1124,6 @@ void() CheckPowerups =
 
 };
 
-void() stupidLightningFunc=
-{
-	//set v_forward to be the direction the player(self) is facing
-	makevectors (self.v_angle);
-	
-	//offset
-	local vector source = self.origin + '0 0 16';
-	
-	//ray cast forward!
-	traceline (source, source + v_forward*5000, FALSE, self);
-	
-	//render a line to the first intersection of our forward line...
-	//draw_line(source, trace_endpos, 111, 0, TRUE);
-	
-	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	WriteByte (MSG_BROADCAST, TE_LIGHTNING1);
-	WriteEntity (MSG_BROADCAST, self.l_ent1);
-	WriteCoord (MSG_BROADCAST, source_x);
-	WriteCoord (MSG_BROADCAST, source_y);
-	WriteCoord (MSG_BROADCAST, source_z);
-	WriteCoord (MSG_BROADCAST, trace_endpos_x);
-	WriteCoord (MSG_BROADCAST, trace_endpos_y);
-	WriteCoord (MSG_BROADCAST, trace_endpos_z);
-	
-	//draw the plane normal
-	//draw_line(trace_endpos, trace_endpos+trace_plane_normal, 208, 6, TRUE);
-	
-	//do the vector refleciton math... I didn't come up with this - just copied it from somewhere else
-	local vector reflected_vel = v_forward - 2*(v_forward*trace_plane_normal)*trace_plane_normal;
-	normalize( reflected_vel );
-	
-	//cache first hit
-	local vector first_hit = trace_endpos;
-	
-	//draw special stuff around entities
-	//if(world != trace_ent)
-	//{
-	//	draw_circle( first_hit, 5, 144,-1, TRUE );
-	//}
-	
-	//it seems that the engine doesn't handle more than one lightning 'writebyte' call 'well' - ie it 
-	// doesn't do what you might hope - so here the workaround is to use another entity in the 
-	// 'writeentity' part of the call - either use one that already exists (world) or make a new one 
-	// for the occasion ('tmp')
-	local entity tmp = spawn();
-	tmp.think = SUB_Remove;
-	//do another traceline from the first collision to the next thing.
-	traceline(first_hit, first_hit + reflected_vel * 5000, FALSE, self);
-	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	WriteByte (MSG_BROADCAST, TE_LIGHTNING1);
-	WriteEntity (MSG_BROADCAST,  self.l_ent2);
-	WriteCoord (MSG_BROADCAST, first_hit_x);
-	WriteCoord (MSG_BROADCAST, first_hit_y);
-	WriteCoord (MSG_BROADCAST, first_hit_z);
-	WriteCoord (MSG_BROADCAST, trace_endpos_x);
-	WriteCoord (MSG_BROADCAST, trace_endpos_y);
-	WriteCoord (MSG_BROADCAST, trace_endpos_z);	
-	remove(tmp);
-	//draw_line(first_hit, trace_endpos, 111, 0, TRUE);
-}
-
 
 /*
 ================
@@ -1233,7 +1165,6 @@ void() PlayerPostThink =
 		self.jump_flag = self.velocity_z;
 
 
-	stupidLightningFunc();
 
 	CheckPowerups ();
 };

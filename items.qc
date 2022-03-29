@@ -382,6 +382,91 @@ weapon_touch
 =============
 */
 float() W_BestWeapon;
+void() ammo_touch =
+{
+local entity	stemp;
+local float		best;
+
+	if (other.classname != "player")
+		return;
+	if (other.health <= 0)
+		return;
+
+// if the player was using his best weapon, change up to the new one if better
+	stemp = self;
+	self = other;
+	best = W_BestWeapon();
+	self = stemp;
+
+
+// shotgun
+	if (self.weapon == 1)
+	{
+		if (other.ammo_shells >= 100)
+			return;
+		other.ammo_shells = other.ammo_shells + self.aflag;
+	}
+
+// spikes
+	if (self.weapon == 2)
+	{
+		if (other.ammo_nails >= 200)
+			return;
+		other.ammo_nails = other.ammo_nails + self.aflag;
+	}
+
+//	rockets
+	if (self.weapon == 3)
+	{
+		if (other.ammo_rockets >= 100)
+			return;
+		other.ammo_rockets = other.ammo_rockets + self.aflag;
+	}
+
+//	cells
+	if (self.weapon == 4)
+	{
+		if (other.ammo_cells >= 100)
+			return;
+		other.ammo_cells = other.ammo_cells + self.aflag;
+	}
+
+	bound_other_ammo ();
+
+	sprint (other, "You got the ");
+	sprint (other, self.netname);
+	sprint (other, "\n");
+// ammo touch sound
+	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
+	stuffcmd (other, "bf\n");
+
+// change to a better weapon if appropriate
+
+	if ( other.weapon == best )
+	{
+		stemp = self;
+		self = other;
+		self.weapon = W_BestWeapon();
+		W_SetCurrentAmmo ();
+		self = stemp;
+	}
+
+// if changed current ammo, update it
+	stemp = self;
+	self = other;
+	W_SetCurrentAmmo();
+	self = stemp;
+
+// remove it in single player, or setup for respawning in deathmatch
+	self.model = string_null;
+	self.solid = SOLID_NOT;
+	if (deathmatch)
+		self.nextthink = time + 30;
+	self.think = SUB_regen;
+
+	activator = other;
+	SUB_UseTargets();				// fire all targets / killtargets
+};
 
 void() weapon_touch =
 {
@@ -499,12 +584,15 @@ void() weapon_touch =
 
 void() weapon_supershotgun =
 {
-	precache_model ("progs/g_shot.mdl");
-	setmodel (self, "progs/g_shot.mdl");
-	self.weapon = IT_SUPER_SHOTGUN;
-	self.netname = "Double-barrelled Shotgun";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
+	self.touch = ammo_touch;
+
+	precache_model ("maps/b_batt0.bsp");
+	setmodel (self, "maps/b_batt0.bsp");
+	self.aflag = 25;
+	
+	self.weapon = 4;
+	self.netname = "cells";
+	setsize (self, '-16 -16 0', '16 16 32');
 	StartItem ();
 };
 
@@ -513,12 +601,15 @@ void() weapon_supershotgun =
 
 void() weapon_nailgun =
 {
-	precache_model ("progs/g_nail.mdl");
-	setmodel (self, "progs/g_nail.mdl");
-	self.weapon = IT_NAILGUN;
-	self.netname = "nailgun";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
+	self.touch = ammo_touch;
+
+	precache_model ("maps/b_batt0.bsp");
+	setmodel (self, "maps/b_batt0.bsp");
+	self.aflag = 25;
+	
+	self.weapon = 4;
+	self.netname = "cells";
+	setsize (self, '-16 -16 0', '16 16 32');
 	StartItem ();
 };
 
@@ -527,12 +618,15 @@ void() weapon_nailgun =
 
 void() weapon_supernailgun =
 {
-	precache_model ("progs/g_nail2.mdl");
-	setmodel (self, "progs/g_nail2.mdl");
-	self.weapon = IT_SUPER_NAILGUN;
-	self.netname = "Super Nailgun";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
+	self.touch = ammo_touch;
+
+	precache_model ("maps/b_batt0.bsp");
+	setmodel (self, "maps/b_batt0.bsp");
+	self.aflag = 25;
+	
+	self.weapon = 4;
+	self.netname = "cells";
+	setsize (self, '-16 -16 0', '16 16 32');
 	StartItem ();
 };
 
@@ -541,12 +635,15 @@ void() weapon_supernailgun =
 
 void() weapon_grenadelauncher =
 {
-	precache_model ("progs/g_rock.mdl");
-	setmodel (self, "progs/g_rock.mdl");
-	self.weapon = 3;
-	self.netname = "Grenade Launcher";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
+	self.touch = ammo_touch;
+
+	precache_model ("maps/b_batt0.bsp");
+	setmodel (self, "maps/b_batt0.bsp");
+	self.aflag = 25;
+	
+	self.weapon = 4;
+	self.netname = "cells";
+	setsize (self, '-16 -16 0', '16 16 32');
 	StartItem ();
 };
 
@@ -555,12 +652,15 @@ void() weapon_grenadelauncher =
 
 void() weapon_rocketlauncher =
 {
-	precache_model ("progs/g_rock2.mdl");
-	setmodel (self, "progs/g_rock2.mdl");
-	self.weapon = 3;
-	self.netname = "Rocket Launcher";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
+	self.touch = ammo_touch;
+
+	precache_model ("maps/b_batt0.bsp");
+	setmodel (self, "maps/b_batt0.bsp");
+	self.aflag = 25;
+	
+	self.weapon = 4;
+	self.netname = "cells";
+	setsize (self, '-16 -16 0', '16 16 32');
 	StartItem ();
 };
 
@@ -570,12 +670,15 @@ void() weapon_rocketlauncher =
 
 void() weapon_lightning =
 {
-	precache_model ("progs/g_light.mdl");
-	setmodel (self, "progs/g_light.mdl");
-	self.weapon = 3;
-	self.netname = "Thunderbolt";
-	self.touch = weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
+	self.touch = ammo_touch;
+
+	precache_model ("maps/b_batt0.bsp");
+	setmodel (self, "maps/b_batt0.bsp");
+	self.aflag = 25;
+	
+	self.weapon = 4;
+	self.netname = "cells";
+	setsize (self, '-16 -16 0', '16 16 32');
 	StartItem ();
 };
 
@@ -588,91 +691,6 @@ AMMO
 ===============================================================================
 */
 
-void() ammo_touch =
-{
-local entity	stemp;
-local float		best;
-
-	if (other.classname != "player")
-		return;
-	if (other.health <= 0)
-		return;
-
-// if the player was using his best weapon, change up to the new one if better
-	stemp = self;
-	self = other;
-	best = W_BestWeapon();
-	self = stemp;
-
-
-// shotgun
-	if (self.weapon == 1)
-	{
-		if (other.ammo_shells >= 100)
-			return;
-		other.ammo_shells = other.ammo_shells + self.aflag;
-	}
-
-// spikes
-	if (self.weapon == 2)
-	{
-		if (other.ammo_nails >= 200)
-			return;
-		other.ammo_nails = other.ammo_nails + self.aflag;
-	}
-
-//	rockets
-	if (self.weapon == 3)
-	{
-		if (other.ammo_rockets >= 100)
-			return;
-		other.ammo_rockets = other.ammo_rockets + self.aflag;
-	}
-
-//	cells
-	if (self.weapon == 4)
-	{
-		if (other.ammo_cells >= 100)
-			return;
-		other.ammo_cells = other.ammo_cells + self.aflag;
-	}
-
-	bound_other_ammo ();
-
-	sprint (other, "You got the ");
-	sprint (other, self.netname);
-	sprint (other, "\n");
-// ammo touch sound
-	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
-	stuffcmd (other, "bf\n");
-
-// change to a better weapon if appropriate
-
-	if ( other.weapon == best )
-	{
-		stemp = self;
-		self = other;
-		self.weapon = W_BestWeapon();
-		W_SetCurrentAmmo ();
-		self = stemp;
-	}
-
-// if changed current ammo, update it
-	stemp = self;
-	self = other;
-	W_SetCurrentAmmo();
-	self = stemp;
-
-// remove it in single player, or setup for respawning in deathmatch
-	self.model = string_null;
-	self.solid = SOLID_NOT;
-	if (deathmatch)
-		self.nextthink = time + 30;
-	self.think = SUB_regen;
-
-	activator = other;
-	SUB_UseTargets();				// fire all targets / killtargets
-};
 
 
 
@@ -688,18 +706,18 @@ void() item_shells =
 
 	if (self.spawnflags & WEAPON_BIG2)
 	{
-		precache_model ("maps/b_shell1.bsp");
-		setmodel (self, "maps/b_shell1.bsp");
-		self.aflag = 40;
+		precache_model ("maps/b_batt1.bsp");
+		setmodel (self, "maps/b_batt1.bsp");
+		self.aflag = 50;
 	}
 	else
 	{
-		precache_model ("maps/b_shell0.bsp");
-		setmodel (self, "maps/b_shell0.bsp");
-		self.aflag = 20;
+		precache_model ("maps/b_batt0.bsp");
+		setmodel (self, "maps/b_batt0.bsp");
+		self.aflag = 25;
 	}
-	self.weapon = 1;
-	self.netname = "shells";
+	self.weapon = 4;
+	self.netname = "cells";
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
 };
@@ -713,18 +731,18 @@ void() item_spikes =
 
 	if (self.spawnflags & WEAPON_BIG2)
 	{
-		precache_model ("maps/b_nail1.bsp");
-		setmodel (self, "maps/b_nail1.bsp");
+		precache_model ("maps/b_batt1.bsp");
+		setmodel (self, "maps/b_batt1.bsp");
 		self.aflag = 50;
 	}
 	else
 	{
-		precache_model ("maps/b_nail0.bsp");
-		setmodel (self, "maps/b_nail0.bsp");
+		precache_model ("maps/b_batt0.bsp");
+		setmodel (self, "maps/b_batt0.bsp");
 		self.aflag = 25;
 	}
-	self.weapon = 2;
-	self.netname = "nails";
+	self.weapon = 4;
+	self.netname = "cells";
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
 };
@@ -738,18 +756,18 @@ void() item_rockets =
 
 	if (self.spawnflags & WEAPON_BIG2)
 	{
-		precache_model ("maps/b_rock1.bsp");
-		setmodel (self, "maps/b_rock1.bsp");
-		self.aflag = 10;
+		precache_model ("maps/b_batt1.bsp");
+		setmodel (self, "maps/b_batt1.bsp");
+		self.aflag = 50;
 	}
 	else
 	{
-		precache_model ("maps/b_rock0.bsp");
-		setmodel (self, "maps/b_rock0.bsp");
-		self.aflag = 5;
+		precache_model ("maps/b_batt0.bsp");
+		setmodel (self, "maps/b_batt0.bsp");
+		self.aflag = 25;
 	}
-	self.weapon = 3;
-	self.netname = "rockets";
+	self.weapon = 4;
+	self.netname = "cells";
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
 };
@@ -766,13 +784,13 @@ void() item_cells =
 	{
 		precache_model ("maps/b_batt1.bsp");
 		setmodel (self, "maps/b_batt1.bsp");
-		self.aflag = 12;
+		self.aflag = 50;
 	}
 	else
 	{
 		precache_model ("maps/b_batt0.bsp");
 		setmodel (self, "maps/b_batt0.bsp");
-		self.aflag = 6;
+		self.aflag = 25;
 	}
 	self.weapon = 4;
 	self.netname = "cells";
@@ -793,60 +811,13 @@ void() item_weapon =
 {
 	self.touch = ammo_touch;
 
-	if (self.spawnflags & WEAPON_SHOTGUN)
-	{
-		if (self.spawnflags & WEAPON_BIG)
-		{
-			precache_model ("maps/b_shell1.bsp");
-			setmodel (self, "maps/b_shell1.bsp");
-			self.aflag = 40;
-		}
-		else
-		{
-			precache_model ("maps/b_shell0.bsp");
-			setmodel (self, "maps/b_shell0.bsp");
-			self.aflag = 20;
-		}
-		self.weapon = 1;
-		self.netname = "shells";
-	}
+	precache_model ("maps/b_batt1.bsp");
+	setmodel (self, "maps/b_batt1.bsp");
+	self.aflag = 25;
+	
 
-	if (self.spawnflags & WEAPON_SPIKES)
-	{
-		if (self.spawnflags & WEAPON_BIG)
-		{
-			precache_model ("maps/b_nail1.bsp");
-			setmodel (self, "maps/b_nail1.bsp");
-			self.aflag = 40;
-		}
-		else
-		{
-			precache_model ("maps/b_nail0.bsp");
-			setmodel (self, "maps/b_nail0.bsp");
-			self.aflag = 20;
-		}
-		self.weapon = 2;
-		self.netname = "spikes";
-	}
-
-	if (self.spawnflags & WEAPON_ROCKET)
-	{
-		if (self.spawnflags & WEAPON_BIG)
-		{
-			precache_model ("maps/b_rock1.bsp");
-			setmodel (self, "maps/b_rock1.bsp");
-			self.aflag = 10;
-		}
-		else
-		{
-			precache_model ("maps/b_rock0.bsp");
-			setmodel (self, "maps/b_rock0.bsp");
-			self.aflag = 5;
-		}
-		self.weapon = 3;
-		self.netname = "rockets";
-	}
-
+	self.weapon = 4;
+	self.netname = "cells";
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
 };

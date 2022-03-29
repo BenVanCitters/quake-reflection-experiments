@@ -209,7 +209,7 @@ void() player_light1   =[$light1, player_light2  ]
 	if (self.weaponframe == 5)
 		self.weaponframe = 1;
 	SuperDamageSound();
-	W_FireLightning();
+	W_FireLightning2();
 	self.attack_finished = time + 0.2;
 };
 void() player_light2   =[$light2, player_light1  ]
@@ -222,7 +222,7 @@ void() player_light2   =[$light2, player_light1  ]
 	if (self.weaponframe == 5)
 		self.weaponframe = 1;
 	SuperDamageSound();
-	W_FireLightning();
+	W_FireLightning2();
 	self.attack_finished = time + 0.2;
 };
 
