@@ -469,7 +469,7 @@ void(vector p1, vector p2, entity from, float damage) LightningDamage =
 // returns a few variables saved on an entity-struct:
 //	.velocity the direction of the bouced ray
 //	.origin   the origin of the next ray
-entity(vector start, vector end, entity teEnt, entity ignore) doThing=
+entity(vector start, vector end, entity teEnt, entity ignore) drawReflectingLightningSegment=
 {
 	//ray cast forward!
 	traceline (start, end, FALSE, ignore);
@@ -505,6 +505,10 @@ entity(vector start, vector end, entity teEnt, entity ignore) doThing=
 	return teEnt;
 }
 
+//these 7 entities are used for the WriteByte/WriteEntity call
+// for creating/drawing the lightning - it seems as though quake-c
+// can only send on such call per entity per-engine callback or possibly frame?
+// further investigation is needed
 .entity l_ent1;
 .entity l_ent2;
 .entity l_ent3;
@@ -512,7 +516,7 @@ entity(vector start, vector end, entity teEnt, entity ignore) doThing=
 .entity l_ent5;
 .entity l_ent6;
 .entity l_ent7;
-void() stupidLightningFunc=
+void() bounceLightningFunc=
 {
 	//offset
 	local vector source = self.origin + '0 0 16';
@@ -520,20 +524,20 @@ void() stupidLightningFunc=
 	//set v_forward to be the direction the player(self) is facing
 	makevectors (self.v_angle);
 	local vector end = source + v_forward*5000;
-	local entity bounce_result = doThing(source, end, self.l_ent1,self);
+	local entity bounce_result = drawReflectingLightningSegment(source, end, self.l_ent1,self);
 
 	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = doThing(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent2, self.l_ent1); }
+	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent2, self.l_ent1); }
 	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = doThing(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent3, self.l_ent1); }
+	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent3, self.l_ent1); }
 	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = doThing(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent4, self.l_ent1); }
+	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent4, self.l_ent1); }
 	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = doThing(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent5, self.l_ent1); }
+	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent5, self.l_ent1); }
 	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = doThing(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent6, self.l_ent1); }
+	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent6, self.l_ent1); }
 	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = doThing(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent7, self.l_ent1); }
+	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent7, self.l_ent1); }
 }
 
 
@@ -568,7 +572,7 @@ void() W_FireLightning2 =
 
 	self.currentammo = self.ammo_cells = self.ammo_cells - .75;
 
-	stupidLightningFunc();
+	bounceLightningFunc();
 };
 
 void() W_FireLightning =
