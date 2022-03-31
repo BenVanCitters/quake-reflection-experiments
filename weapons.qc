@@ -460,7 +460,15 @@ void(vector p1, vector p2, entity from, float damage) LightningDamage =
 	}
 };
 
-
+//start is the starting position of the lightning in world coords
+//end is the ending position of the lightning in world coords
+//teEnt is the entity to use for the writebyte call
+//ignore is an entity to ignore for the traceline
+//    - traceline can optionally not hit a particular entity
+//
+// returns a few variables saved on an entity-struct:
+//	.velocity the direction of the bouced ray
+//	.origin   the origin of the next ray
 entity(vector start, vector end, entity teEnt, entity ignore) doThing=
 {
 	//ray cast forward!
