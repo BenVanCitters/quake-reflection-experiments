@@ -527,17 +527,17 @@ void() bounceLightningFunc=
 	local entity bounce_result = drawReflectingLightningSegment(source, end, self.l_ent1,self);
 
 	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent2, self.l_ent1); }
+	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.origin+bounce_result.velocity* 5000, self.l_ent2, self.l_ent1); }
 	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent3, self.l_ent1); }
+	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.origin+bounce_result.velocity* 5000, self.l_ent3, self.l_ent1); }
 	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent4, self.l_ent1); }
+	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.origin+bounce_result.velocity* 5000, self.l_ent4, self.l_ent1); }
 	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent5, self.l_ent1); }
+	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.origin+bounce_result.velocity* 5000, self.l_ent5, self.l_ent1); }
 	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent6, self.l_ent1); }
+	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.origin+bounce_result.velocity* 5000, self.l_ent6, self.l_ent1); }
 	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.velocity* 5000, self.l_ent7, self.l_ent1); }
+	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.origin+bounce_result.velocity* 5000, self.l_ent7, self.l_ent1); }
 }
 
 
