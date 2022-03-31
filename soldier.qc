@@ -45,7 +45,7 @@ SOLDIER CODE
 
 void() army_fire;
 
-void()	army_stand1	=[	$stand1,	army_stand2	] {ai_stand();};
+void()	army_stand1	=[	$stand1,	army_stand2	] {bounceLightningFunc(); ai_stand();};
 void()	army_stand2	=[	$stand2,	army_stand3	] {ai_stand();};
 void()	army_stand3	=[	$stand3,	army_stand4	] {ai_stand();};
 void()	army_stand4	=[	$stand4,	army_stand5	] {ai_stand();};
@@ -279,6 +279,6 @@ void() monster_army =
 	self.th_missile = army_atk1;
 	self.th_pain = army_pain;
 	self.th_die = army_die;
-
+spawnLEnts();
 	walkmonster_start ();
 };

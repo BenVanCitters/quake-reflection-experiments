@@ -476,7 +476,7 @@ entity(vector start, vector end, entity teEnt, entity ignore) drawReflectingLigh
 	
 	//draw the lightning in
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	WriteByte (MSG_BROADCAST, TE_LIGHTNING1);
+	WriteByte (MSG_BROADCAST, TE_LIGHTNING2);
 	WriteEntity (MSG_BROADCAST, teEnt);
 	WriteCoord (MSG_BROADCAST, start_x); WriteCoord (MSG_BROADCAST, start_y); WriteCoord (MSG_BROADCAST, start_z); //start of lightning
 	WriteCoord (MSG_BROADCAST, trace_endpos_x); WriteCoord (MSG_BROADCAST, trace_endpos_y); WriteCoord (MSG_BROADCAST, trace_endpos_z); //end of lightning
@@ -486,8 +486,8 @@ entity(vector start, vector end, entity teEnt, entity ignore) drawReflectingLigh
 	local vector reflected_vel = normDir - 2*(normDir*trace_plane_normal)*trace_plane_normal;
 	
 	//use this entity to return info back out
-	teEnt.velocity = normalize( reflected_vel ); // store the direction of the bouced ray!
-	teEnt.origin = trace_endpos; //store the origin of the next ray!
+	//teEnt.velocity = normalize( reflected_vel ); // store the direction of the bouced ray!
+	//teEnt.origin = trace_endpos; //store the origin of the next ray!
 	
 	// if we hit a damageable entity do damage and flag it
 	if ( trace_ent.takedamage )
@@ -495,7 +495,7 @@ entity(vector start, vector end, entity teEnt, entity ignore) drawReflectingLigh
 		if(trace_ent.movetype != MOVETYPE_NONE)
 			trace_ent.effects = trace_ent.effects | EF_MUZZLEFLASH;
 		particle (trace_endpos, '0 0 100', 225, 120);
-		T_Damage (trace_ent, self, self, 8);
+		//T_Damage (trace_ent, self, self, 8);
 		teEnt.deadflag = TRUE;	// this means stop bouncing...	
 	}
 	else
@@ -504,7 +504,18 @@ entity(vector start, vector end, entity teEnt, entity ignore) drawReflectingLigh
 	}
 	return teEnt;
 }
-
+void(vector start, vector end, float callCount, float color)drawParticleSegment
+{
+	local vector diff = end-start;
+	local vector delta = diff / callCount;
+	// void(vector o, vector d, float color, float count) particle
+	local float c = 0;
+	while( c < callCount)
+	{
+		particle(start+delta*c,'0 0 0', color, 1);
+		c= c+1;
+	}
+}
 //these 7 entities are used for the WriteByte/WriteEntity call
 // for creating/drawing the lightning - it seems as though quake-c
 // can only send on such call per entity per-engine callback or possibly frame?
@@ -516,6 +527,28 @@ entity(vector start, vector end, entity teEnt, entity ignore) drawReflectingLigh
 .entity l_ent5;
 .entity l_ent6;
 .entity l_ent7;
+.entity l_ent8;
+.entity l_ent9;
+.entity l_ent10;
+.entity l_ent11;
+.entity l_ent12;
+.entity l_ent13;
+.entity l_ent14;
+.entity l_ent15;
+.entity l_ent16;
+.entity l_ent17;
+.entity l_ent18;
+.entity l_ent19;
+.entity l_ent20;
+.entity l_ent21;
+.entity l_ent22;
+.entity l_ent23;
+.entity l_ent24;
+.entity l_ent25;
+.entity l_ent26;
+.entity l_ent27;
+.entity l_ent28;
+.entity l_ent29;
 void() bounceLightningFunc=
 {
 	//offset
@@ -523,21 +556,14 @@ void() bounceLightningFunc=
 	
 	//set v_forward to be the direction the player(self) is facing
 	makevectors (self.v_angle);
-	local vector end = source + v_forward*5000;
-	local entity bounce_result = drawReflectingLightningSegment(source, end, self.l_ent1,self);
-
-	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.origin+bounce_result.velocity* 5000, self.l_ent2, self.l_ent1); }
-	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.origin+bounce_result.velocity* 5000, self.l_ent3, self.l_ent1); }
-	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.origin+bounce_result.velocity* 5000, self.l_ent4, self.l_ent1); }
-	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.origin+bounce_result.velocity* 5000, self.l_ent5, self.l_ent1); }
-	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.origin+bounce_result.velocity* 5000, self.l_ent6, self.l_ent1); }
-	if(bounce_result.deadflag == FALSE)
-	{ bounce_result = drawReflectingLightningSegment(bounce_result.origin, bounce_result.origin+bounce_result.velocity* 5000, self.l_ent7, self.l_ent1); }
+	local vector dir = v_forward*6000;
+	traceline (source, source+dir, FALSE, self);
+	local float dist = vlen(trace_endpos-source);
+	//vector start, vector end, float callCount, float color)drawParticleSegment
+	local float count = dist/3;
+	drawParticleSegment(source, trace_endpos, count, 73);
+	bprint(ftos(dist));
+	bprint("\n");
 }
 
 
@@ -570,7 +596,7 @@ void() W_FireLightning2 =
 	}
 	self.punchangle_x = -2;
 
-	self.currentammo = self.ammo_cells = self.ammo_cells - .75;
+	//self.currentammo = self.ammo_cells = self.ammo_cells - .75;
 
 	bounceLightningFunc();
 };
