@@ -22,6 +22,7 @@ void() W_Precache =
 	precache_sound ("weapons/grenade.wav");	// grenade launcher
 	precache_sound ("weapons/bounce.wav");		// grenade bounce
 	precache_sound ("weapons/shotgn2.wav");	// super shotgun
+	precache_model2 ("progs/laser.mdl");
 };
 
 float() crandom =
@@ -516,39 +517,45 @@ void(vector start, vector end, float callCount, float color)drawParticleSegment
 		c= c+1;
 	}
 }
+
+void(vector start, vector end, float callCount) drawLaserSegment
+{
+	local vector diff = end-start;
+	local vector delta = diff / callCount;
+	local entity tmpEnt;
+	// void(vector o, vector d, float color, float count) particle
+	local float c = 0;
+	local float mult = 1;
+	while( c < callCount)
+	{
+		tmpEnt = spawn();
+		tmpEnt.think = SUB_Remove;
+		tmpEnt.nextthink = time+2.05;
+		setmodel(tmpEnt, "progs/laser.mdl");
+		tmpEnt.solid = SOLID_NOT;
+		tmpEnt.movetype = MOVETYPE_NOCLIP;
+		//tmpEnt.origin = start+delta*c;
+		setorigin (tmpEnt,  start+delta*c);
+		
+		tmpEnt.avelocity_x = random()-0.5;
+		tmpEnt.avelocity_y = random()-0.5;
+		tmpEnt.avelocity_z = 0;
+		tmpEnt.avelocity = normalize(tmpEnt.avelocity);
+		local float rotation_amount = 20.0;
+		tmpEnt.avelocity = tmpEnt.avelocity*rotation_amount;
+		
+		tmpEnt.angles = vectoangles(mult*delta);
+		tmpEnt.alpha = .5;
+		mult = mult * -1;
+		//particle(start+delta*c,'0 0 0', color, 1);
+		c= c+1;
+	}
+}
 //these 7 entities are used for the WriteByte/WriteEntity call
 // for creating/drawing the lightning - it seems as though quake-c
 // can only send on such call per entity per-engine callback or possibly frame?
 // further investigation is needed
-.entity l_ent1;
-.entity l_ent2;
-.entity l_ent3;
-.entity l_ent4;
-.entity l_ent5;
-.entity l_ent6;
-.entity l_ent7;
-.entity l_ent8;
-.entity l_ent9;
-.entity l_ent10;
-.entity l_ent11;
-.entity l_ent12;
-.entity l_ent13;
-.entity l_ent14;
-.entity l_ent15;
-.entity l_ent16;
-.entity l_ent17;
-.entity l_ent18;
-.entity l_ent19;
-.entity l_ent20;
-.entity l_ent21;
-.entity l_ent22;
-.entity l_ent23;
-.entity l_ent24;
-.entity l_ent25;
-.entity l_ent26;
-.entity l_ent27;
-.entity l_ent28;
-.entity l_ent29;
+
 void() bounceLightningFunc=
 {
 	//offset
@@ -559,10 +566,10 @@ void() bounceLightningFunc=
 	local vector dir = v_forward*6000;
 	traceline (source, source+dir, FALSE, self);
 	local float dist = vlen(trace_endpos-source);
-	//vector start, vector end, float callCount, float color)drawParticleSegment
-	local float count = dist/3;
-	drawParticleSegment(source, trace_endpos, count, 73);
-	bprint(ftos(dist));
+	local float count = dist/18;
+	drawLaserSegment(source, trace_endpos, count);
+	//drawParticleSegment(source, trace_endpos, count, 73);
+	bprint(ftos(count));
 	bprint("\n");
 }
 

@@ -279,6 +279,6 @@ void() monster_army =
 	self.th_missile = army_atk1;
 	self.th_pain = army_pain;
 	self.th_die = army_die;
-spawnLEnts();
+
 	walkmonster_start ();
 };

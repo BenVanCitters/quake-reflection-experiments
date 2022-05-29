@@ -487,44 +487,11 @@ called each time a player is spawned
 void() DecodeLevelParms;
 void() PlayerDie;
 
-void() spawnLEnts=
-{
-self.l_ent1 = spawn();
-self.l_ent2 = spawn();
-self.l_ent3 = spawn();
-self.l_ent4 = spawn();
-self.l_ent5 = spawn();
-self.l_ent6 = spawn();
-self.l_ent7 = spawn();	
-self.l_ent8 = spawn();
-self.l_ent9 = spawn();
-self.l_ent10 = spawn();	
-self.l_ent11 = spawn();
-self.l_ent12 = spawn();
-self.l_ent13 = spawn();
-self.l_ent14 = spawn();
-self.l_ent15 = spawn();
-self.l_ent16 = spawn();
-self.l_ent17 = spawn();	
-self.l_ent18 = spawn();
-self.l_ent19 = spawn();
-self.l_ent20 = spawn();	
-self.l_ent21 = spawn();
-self.l_ent22 = spawn();
-self.l_ent23 = spawn();
-self.l_ent24 = spawn();
-self.l_ent25 = spawn();
-self.l_ent26 = spawn();
-self.l_ent27 = spawn();	
-self.l_ent28 = spawn();
-self.l_ent29 = spawn();
-self.l_ent10 = spawn();	
-}
+
 void() PutClientInServer =
 {
 	local	entity spot;
 
-spawnLEnts();
 	spot = SelectSpawnPoint ();
 
 	self.classname = "player";

@@ -210,7 +210,7 @@ void() player_light1   =[$light1, player_light2  ]
 		self.weaponframe = 1;
 	SuperDamageSound();
 	W_FireLightning2();
-	self.attack_finished = time + 0.2;
+	self.attack_finished = time + 0.016;
 };
 void() player_light2   =[$light2, player_light1  ]
 {
@@ -223,7 +223,7 @@ void() player_light2   =[$light2, player_light1  ]
 		self.weaponframe = 1;
 	SuperDamageSound();
 	W_FireLightning2();
-	self.attack_finished = time + 0.2;
+	self.attack_finished = time + 0.002;
 };
 
 //============================================================================
